@@ -10,10 +10,22 @@ import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
 import {MySequence} from './sequence';
 
+// Use environment variables from .env file
+import * as dotenv from 'dotenv';
+
 export class DotenvDemoApplication extends BootMixin(
   ServiceMixin(RepositoryMixin(RestApplication)),
 ) {
   constructor(options: ApplicationConfig = {}) {
+    // If NODE_ENV is not set, assume we're running in local
+    if (!process.env.NODE_ENV) {
+      const loadedConfig = dotenv.config();
+      if (loadedConfig.error) {
+        console.log('ERROR: Failed to load .env file.');
+        process.exit(1);
+      }
+    }
+
     super(options);
 
     // Set up the custom sequence
